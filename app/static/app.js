@@ -336,18 +336,28 @@ function loadNavConnection() {
 
 async function loadTraceroute() {
   const tbody = document.querySelector("#info-trace tbody");
+  const counter = document.getElementById("trace-count");
   tbody.innerHTML = '<tr><td colspan="7" class="muted">running…</td></tr>';
+  if (counter) counter.textContent = "running…";
   try {
     const r = await fetch("/api/traceroute");
     const d = await r.json();
     if (d.status !== "ok") {
       tbody.innerHTML = `<tr><td colspan="7" class="muted">${d.error || d.status}</td></tr>`;
+      if (counter) counter.textContent = d.status || "error";
       return;
     }
     const hubs = d.report && d.report.hubs ? d.report.hubs : [];
     if (!hubs.length) {
       tbody.innerHTML = '<tr><td colspan="7" class="muted">(no hops)</td></tr>';
+      if (counter) counter.textContent = "0 hops";
       return;
+    }
+    const reachableHops = hubs.filter(h => h.host && h.host !== "???").length;
+    if (counter) {
+      counter.textContent = reachableHops === hubs.length
+        ? `${hubs.length} hops`
+        : `${hubs.length} hops (${reachableHops} reachable)`;
     }
     tbody.innerHTML = "";
     for (const h of hubs) {
@@ -357,6 +367,7 @@ async function loadTraceroute() {
     }
   } catch (e) {
     tbody.innerHTML = `<tr><td colspan="7" class="muted">(error: ${e.message})</td></tr>`;
+    if (counter) counter.textContent = "error";
   }
 }
 
