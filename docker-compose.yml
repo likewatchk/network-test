@@ -1,0 +1,17 @@
+services:
+  net-inspector:
+    build: .
+    image: network-inspector:latest
+    container_name: network-inspector
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    # mtr needs raw ICMP sockets — without this, /api/traceroute fails inside container.
+    cap_add:
+      - NET_RAW
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:5000/api/server-info', timeout=3).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

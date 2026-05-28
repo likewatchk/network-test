@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Network Performance Inspector</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <div class="brand">Network Performance Inspector</div>
+      <div class="conn-status">
+        <span id="ping-status" class="dot dot-off" title="ping ws"></span>
+        <span id="video-status" class="dot dot-off" title="video ws"></span>
+        <span id="server-banner"></span>
+      </div>
+    </header>
+
+    <section id="video-pane">
+      <div class="video-wrap">
+        <canvas id="video-canvas" width="1280" height="720"></canvas>
+        <div class="video-overlay">
+          <span id="hud-fps">— fps</span>
+          <span id="hud-kbps">— KB/s</span>
+          <span id="hud-delay">— ms</span>
+        </div>
+      </div>
+      <div class="controls">
+        <label>Bitrate <span id="lbl-bitrate">500</span> KB/s
+          <input id="ctl-bitrate" type="range" min="100" max="5000" step="50" value="500" />
+        </label>
+        <label>FPS <span id="lbl-fps">30</span>
+          <input id="ctl-fps" type="range" min="5" max="60" step="1" value="30" />
+        </label>
+        <label>Resolution
+          <select id="ctl-resolution">
+            <option value="480p">480p</option>
+            <option value="720p" selected>720p</option>
+            <option value="1080p">1080p</option>
+          </select>
+        </label>
+        <label>JPEG Quality <span id="lbl-quality">80</span>
+          <input id="ctl-quality" type="range" min="30" max="95" step="1" value="80" />
+        </label>
+      </div>
+    </section>
+
+    <section id="chart-pane">
+      <div class="chart-card"><h3>Ping RTT (ms)</h3><canvas id="chart-ping"></canvas></div>
+      <div class="chart-card"><h3>Streaming Delay (ms)</h3><canvas id="chart-delay"></canvas></div>
+      <div class="chart-card"><h3>Bandwidth (KB/s)</h3><canvas id="chart-bw"></canvas></div>
+      <div class="chart-card"><h3>Frame Rate (fps)</h3><canvas id="chart-fps"></canvas></div>
+    </section>
+
+    <section id="info-pane">
+      <div class="info-card">
+        <h3>Server</h3>
+        <dl id="info-server">
+          <dt>IP</dt><dd data-key="ip">—</dd>
+          <dt>Location</dt><dd data-key="loc">—</dd>
+          <dt>ASN</dt><dd data-key="asn">—</dd>
+          <dt>ISP</dt><dd data-key="isp">—</dd>
+          <dt>Hostname</dt><dd data-key="host">—</dd>
+          <dt>Uptime</dt><dd data-key="uptime">—</dd>
+        </dl>
+      </div>
+
+      <div class="info-card">
+        <h3>Client</h3>
+        <dl id="info-client">
+          <dt>IP</dt><dd data-key="ip">—</dd>
+          <dt>Location</dt><dd data-key="loc">—</dd>
+          <dt>ASN/ISP</dt><dd data-key="asn">—</dd>
+          <dt>User-Agent</dt><dd data-key="ua" class="ua">—</dd>
+          <dt>Screen</dt><dd data-key="screen">—</dd>
+          <dt>Viewport</dt><dd data-key="vp">—</dd>
+          <dt>Timezone</dt><dd data-key="tz">—</dd>
+          <dt>Geolocation</dt><dd data-key="geo">—</dd>
+        </dl>
+      </div>
+
+      <div class="info-card">
+        <h3>navigator.connection</h3>
+        <dl id="info-nav">
+          <dt>downlink</dt><dd data-key="downlink">—</dd>
+          <dt>rtt</dt><dd data-key="rtt">—</dd>
+          <dt>effectiveType</dt><dd data-key="eff">—</dd>
+          <dt>type</dt><dd data-key="type">—</dd>
+          <dt>saveData</dt><dd data-key="sd">—</dd>
+        </dl>
+      </div>
+
+      <div class="info-card">
+        <h3>Ping Statistics (last 100)</h3>
+        <dl id="info-ping">
+          <dt>samples</dt><dd data-key="n">—</dd>
+          <dt>min</dt><dd data-key="min">—</dd>
+          <dt>avg</dt><dd data-key="avg">—</dd>
+          <dt>median</dt><dd data-key="med">—</dd>
+          <dt>max</dt><dd data-key="max">—</dd>
+          <dt>jitter</dt><dd data-key="jit">—</dd>
+          <dt>loss%</dt><dd data-key="loss">—</dd>
+          <dt>clock offset</dt><dd data-key="off">—</dd>
+        </dl>
+      </div>
+
+      <div class="info-card wide">
+        <h3>Traceroute (mtr) <button id="btn-trace">refresh</button></h3>
+        <table id="info-trace">
+          <thead><tr><th>#</th><th>host</th><th>loss%</th><th>snt</th><th>avg ms</th><th>best</th><th>worst</th></tr></thead>
+          <tbody><tr><td colspan="7" class="muted">running…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
