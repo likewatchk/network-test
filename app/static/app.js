@@ -190,7 +190,11 @@ function openVideoWs() {
     const serverTsMs = serverTsUs / 1000;
     const offset = pingState.bestOffset;
     if (offset !== null) {
-      const delay = clientNowMs - (serverTsMs + offset);
+      // offset = serverClock - clientClock at the moment of the min-RTT sample.
+      // To convert a server timestamp into the client's timeline:
+      //   client_equivalent = serverTs - offset
+      // One-way delay = clientNow - client_equivalent = clientNow - serverTs + offset.
+      const delay = clientNowMs - serverTsMs + offset;
       videoState.delaysWindow.push(delay);
     }
     videoState.framesWindow += 1;
